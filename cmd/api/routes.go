@@ -15,7 +15,14 @@ func (app *application) routes() http.Handler {
 
 	router.HandlerFunc(http.MethodGet, "/v1/healthcheck", app.healthcheckHandler)
 
+	router.HandlerFunc(http.MethodGet, "/v1/languages", app.getLanguagesHandler)
+
+	router.HandlerFunc(http.MethodGet, "/v1/points", app.getPointsHandler)
+
+	router.HandlerFunc(http.MethodGet, "/v1/quizzes", app.getQuizzesHandler)
+
 	router.HandlerFunc(http.MethodGet, "/v1/users", app.getUserHandler)
+	router.HandlerFunc(http.MethodPost, "/v1/users", app.registerUserHandler)
 
 	router.Handler(http.MethodGet, "/debug/vars", expvar.Handler())
 

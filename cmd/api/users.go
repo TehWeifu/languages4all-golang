@@ -8,6 +8,34 @@ import (
 )
 
 func (app *application) registerUserHandler(w http.ResponseWriter, r *http.Request) {
+	var input struct {
+		Id         int64  `json:"id"`
+		Name       string `json:"name"`
+		AndroidUid string `json:"android_id"`
+	}
+
+	err := app.readJSON(w, r, &input)
+	if err != nil {
+		app.badRequestResponse(w, r, err)
+		return
+	}
+
+	user := &data.User{
+		Name:       input.Name,
+		AndroidUid: input.AndroidUid,
+	}
+
+	err = app.models.Users.Insert(user)
+	if err != nil {
+		// TODO: triage the error case for user duplication (name + android_uid)
+		app.serverErrorResponse(w, r, err)
+		return
+	}
+
+	err = app.writeJSON(w, http.StatusAccepted, envelope{"user": user}, nil)
+	if err != nil {
+		app.serverErrorResponse(w, r, err)
+	}
 }
 
 func (app *application) getUserHandler(w http.ResponseWriter, r *http.Request) {

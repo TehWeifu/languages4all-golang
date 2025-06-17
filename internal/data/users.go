@@ -45,3 +45,19 @@ func (m UserModel) GetByNameAndAndroidUid(name, androidUid string) (*User, error
 
 	return &user, nil
 }
+
+func (m UserModel) Insert(user *User) error {
+	query := `
+		INSERT INTO users (android_uid, name) 
+		VALUES ($1, $2)
+		RETURNING id`
+
+	args := []any{user.AndroidUid, user.Name}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Hour)
+	defer cancel()
+
+	err := m.DB.QueryRowContext(ctx, query, args...).Scan(&user.ID)
+	// TODO: do error triaging to discover if there is a duplicated name + android_uid
+	return err
+}
