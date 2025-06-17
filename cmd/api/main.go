@@ -12,6 +12,7 @@ import (
 	"time"
 
 	_ "github.com/lib/pq"
+	"github.com/tehweifu/languages4all-golang/internal/data"
 	"github.com/tehweifu/languages4all-golang/internal/vcs"
 )
 
@@ -38,6 +39,7 @@ type config struct {
 type application struct {
 	config config
 	logger *slog.Logger
+	models data.Models
 }
 
 func main() {
@@ -89,6 +91,7 @@ func main() {
 	app := application{
 		config: cfg,
 		logger: logger,
+		models: data.NewModels(db),
 	}
 
 	err = app.serve()

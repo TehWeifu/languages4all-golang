@@ -15,6 +15,8 @@ func (app *application) routes() http.Handler {
 
 	router.HandlerFunc(http.MethodGet, "/v1/healthcheck", app.healthcheckHandler)
 
+	router.HandlerFunc(http.MethodGet, "/v1/users", app.getUserHandler)
+
 	router.Handler(http.MethodGet, "/debug/vars", expvar.Handler())
 
 	return app.metrics(app.recoverPanic(app.rateLimit(router)))
