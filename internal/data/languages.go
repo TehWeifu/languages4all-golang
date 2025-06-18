@@ -3,6 +3,7 @@ package data
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 	"time"
 )
@@ -57,4 +58,35 @@ func (m *LanguageModel) GetAll() ([]*Language, error) {
 	}
 
 	return languages, nil
+}
+
+func (m *LanguageModel) GetById(id int64) (*Language, error) {
+	query := fmt.Sprintf(`
+		SELECT id, code, name, image_resource, choose_title
+		FROM languages
+		WHERE id = $1`)
+
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Hour)
+	defer cancel()
+
+	var language Language
+
+	err := m.DB.QueryRowContext(ctx, query, id).Scan(
+		&language.ID,
+		&language.Code,
+		&language.Name,
+		&language.ImageResource,
+		&language.ChooseTitle,
+	)
+
+	if err != nil {
+		switch {
+		case errors.Is(err, sql.ErrNoRows):
+			return nil, ErrRecordNotFound
+		default:
+			return nil, err
+		}
+	}
+
+	return &language, nil
 }

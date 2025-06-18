@@ -15,7 +15,8 @@ func (app *application) routes() http.Handler {
 
 	router.HandlerFunc(http.MethodGet, "/v1/healthcheck", app.healthcheckHandler)
 
-	router.HandlerFunc(http.MethodGet, "/v1/languages", app.getLanguagesHandler)
+	router.HandlerFunc(http.MethodGet, "/v1/languages", app.listLanguagesHandler)
+	router.HandlerFunc(http.MethodGet, "/v1/languages/:id", app.getLanguageHandler)
 
 	router.HandlerFunc(http.MethodGet, "/v1/points", app.getPointsHandler)
 	router.HandlerFunc(http.MethodPost, "/v1/points", app.savePointsHandler)
