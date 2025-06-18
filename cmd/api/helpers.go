@@ -23,7 +23,7 @@ func (app *application) writeJSON(w http.ResponseWriter, status int, data envelo
 		w.Header()[key] = value
 	}
 
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	w.WriteHeader(status)
 	w.Write(js)
 

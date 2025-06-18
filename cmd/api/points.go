@@ -4,6 +4,8 @@ import (
 	"errors"
 	"net/http"
 	"strconv"
+
+	"github.com/tehweifu/languages4all-golang/internal/data"
 )
 
 func (app *application) getPointsHandler(w http.ResponseWriter, r *http.Request) {
@@ -26,6 +28,43 @@ func (app *application) getPointsHandler(w http.ResponseWriter, r *http.Request)
 	}
 
 	err = app.writeJSON(w, http.StatusOK, envelope{"points": points}, nil)
+	if err != nil {
+		app.serverErrorResponse(w, r, err)
+	}
+}
+
+func (app *application) savePointsHandler(w http.ResponseWriter, r *http.Request) {
+	// TODO: implement cleaner function and validations
+
+	var input struct {
+		QuizID               int64 `json:"quiz_id"`
+		UserID               int64 `json:"user_id"`
+		Points               int   `json:"points"`
+		Completed            int   `json:"completed"`
+		CurrentQuestionOrder int   `json:"currentQuestionOrder"`
+	}
+
+	err := app.readJSON(w, r, &input)
+	if err != nil {
+		app.badRequestResponse(w, r, err)
+		return
+	}
+
+	score := &data.Point{
+		QuizID:               input.QuizID,
+		UserID:               input.UserID,
+		Points:               input.Points,
+		Completed:            input.Completed,
+		CurrentQuestionOrder: input.CurrentQuestionOrder,
+	}
+
+	err = app.models.Points.Upsert(score)
+	if err != nil {
+		app.serverErrorResponse(w, r, err)
+		return
+	}
+
+	err = app.writeJSON(w, http.StatusOK, envelope{"saved": "ok"}, nil)
 	if err != nil {
 		app.serverErrorResponse(w, r, err)
 	}

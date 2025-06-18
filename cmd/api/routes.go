@@ -18,6 +18,7 @@ func (app *application) routes() http.Handler {
 	router.HandlerFunc(http.MethodGet, "/v1/languages", app.getLanguagesHandler)
 
 	router.HandlerFunc(http.MethodGet, "/v1/points", app.getPointsHandler)
+	router.HandlerFunc(http.MethodPost, "/v1/points", app.savePointsHandler)
 
 	router.HandlerFunc(http.MethodGet, "/v1/questions", app.getQuestionsHandler)
 	router.HandlerFunc(http.MethodGet, "/v1/questions/random", app.getRandomQuestionsHandler)
