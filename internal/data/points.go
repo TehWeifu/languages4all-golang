@@ -8,11 +8,11 @@ import (
 )
 
 type Point struct {
-	QuizID               int64  `json:"quiz_id"`
-	Points               int    `json:"points"`
-	MaxPoints            int    `json:"maxPoints"`
-	Completed            int    `json:"completed"`
-	CurrentQuestionOrder string `json:"currentQuestionOrder"`
+	QuizID               int64 `json:"quiz_id"`
+	Points               int   `json:"points"`
+	MaxPoints            int   `json:"maxPoints"`
+	Completed            int   `json:"completed"`
+	CurrentQuestionOrder int   `json:"currentQuestionOrder"`
 }
 
 type PointModel struct {

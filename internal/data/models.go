@@ -14,6 +14,7 @@ type Models struct {
 	Languages LanguageModel
 	Quizzes   QuizModel
 	Points    PointModel
+	Questions QuestionModel
 }
 
 func NewModels(db *sql.DB) Models {
@@ -22,5 +23,6 @@ func NewModels(db *sql.DB) Models {
 		Languages: LanguageModel{DB: db},
 		Quizzes:   QuizModel{DB: db},
 		Points:    PointModel{DB: db},
+		Questions: QuestionModel{DB: db},
 	}
 }
