@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"net/http"
+	"strconv"
 
 	"github.com/tehweifu/languages4all-golang/internal/data"
 )
@@ -63,6 +64,27 @@ func (app *application) getUserHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	err = app.writeJSON(w, http.StatusOK, envelope{"user": user}, nil)
+	if err != nil {
+		app.serverErrorResponse(w, r, err)
+	}
+}
+
+func (app *application) getUserRankingHandler(w http.ResponseWriter, r *http.Request) {
+	language, err := strconv.ParseInt(r.URL.Query().Get("language"), 10, 64)
+	if err != nil {
+		app.badRequestResponse(w, r, errors.New("invalid or missing language parameter"))
+		return
+	}
+
+	androidUid := r.URL.Query().Get("android_id")
+
+	usersRanking, err := app.models.Users.GetRanking(language, androidUid)
+	if err != nil {
+		app.serverErrorResponse(w, r, err)
+		return
+	}
+
+	err = app.writeJSON(w, http.StatusOK, envelope{"points": usersRanking}, nil)
 	if err != nil {
 		app.serverErrorResponse(w, r, err)
 	}

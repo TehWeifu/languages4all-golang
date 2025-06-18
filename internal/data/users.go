@@ -13,6 +13,12 @@ type User struct {
 	AndroidUid string `json:"android_uid"`
 }
 
+type UserRanking struct {
+	UserID int64  `json:"user_id"`
+	Name   string `json:"name"`
+	Total  int    `json:"total"`
+}
+
 type UserModel struct {
 	DB *sql.DB
 }
@@ -60,4 +66,50 @@ func (m UserModel) Insert(user *User) error {
 	err := m.DB.QueryRowContext(ctx, query, args...).Scan(&user.ID)
 	// TODO: do error triaging to discover if there is a duplicated name + android_uid
 	return err
+}
+
+func (m UserModel) GetRanking(language int64, androidUid string) ([]*UserRanking, error) {
+	query := `
+		SELECT user_id, u.name, SUM(maxpoints) AS total 
+		FROM user_quizzes_points
+		JOIN users u on u.id = user_quizzes_points.user_id
+		JOIN quizzes q on user_quizzes_points.quiz_id = q.id
+		WHERE q.language = $1 AND (android_uid = $2 OR $2 = '')
+		GROUP BY user_id, u.name 
+		ORDER BY total
+		LIMIT 50`
+
+	args := []any{language, androidUid}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Hour)
+	defer cancel()
+
+	rows, err := m.DB.QueryContext(ctx, query, args...)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	usersRanking := []*UserRanking{}
+	for rows.Next() {
+		var userRanking UserRanking
+
+		err := rows.Scan(
+			&userRanking.UserID,
+			&userRanking.Name,
+			&userRanking.Total,
+		)
+
+		if err != nil {
+			return nil, err
+		}
+
+		usersRanking = append(usersRanking, &userRanking)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return usersRanking, nil
 }

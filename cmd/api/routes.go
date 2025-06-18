@@ -28,6 +28,7 @@ func (app *application) routes() http.Handler {
 
 	router.HandlerFunc(http.MethodGet, "/v1/users", app.getUserHandler)
 	router.HandlerFunc(http.MethodPost, "/v1/users", app.registerUserHandler)
+	router.HandlerFunc(http.MethodGet, "/v1/users/ranking", app.getUserRankingHandler)
 
 	router.Handler(http.MethodGet, "/debug/vars", expvar.Handler())
 
